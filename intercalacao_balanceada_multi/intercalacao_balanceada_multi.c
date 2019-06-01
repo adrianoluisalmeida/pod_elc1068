@@ -39,7 +39,7 @@ void le_arq(char *nome){
 
   while( 1 == fread(&num,sizeof(num),1,arq)){
     printf("%d:%d\t",i++,num);
-  //  printf("%d",i++,num);
+    
     if (i%RAM==0) 
       printf("\n");
   }
