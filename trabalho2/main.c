@@ -1,31 +1,36 @@
+#include <locale.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include<stdbool.h>
+#include <string.h>
 #include <time.h>
 
 
 //RANDOM NUMBER
-int randomRange(int min, int max){
-    return ( rand() % ( max - min ) ) + min;
+int serieRandomica(int min, int max){
+    return(rand() % (max - min)) + min;
 }
 
 //IMPRIME O VETOR
-void printVector(int *vector, int start, int end){
+void imprimeVetor(int *vetor, int inicio, int fim){
     int i;
-    for(i = start; i <= end; i++){
-        printf("%d ", vector[i]);
+    
+    printf("\t\t\t");
+    for(i = inicio; i <= fim; i++){
+        printf("%d", vetor[i]);
     }
 }
 
 /*
-* Tabela de verdade da técnica proposta
+* Tabela verdade da técnica proposta
 *
 * 0 and 0 -> 0 = 0
 * 1 and 1 -> 1 = 1
 * 0 and 1 -> \0 = 2
 * 1 and 0 -> \1 = 3
 */
-int compress(int val1, int val2){
+
+int comprimeDados(int val1, int val2){
     if(val1 == 0 && val2 == 0)
         return 0;
     else if(val1 == 1 && val2 == 1)
@@ -39,8 +44,22 @@ int compress(int val1, int val2){
     }
 }
 
+int descomprimeDados(int val1){
+    if(val1 == 0)
+       	return 00;
+    else if(val1 == 1)
+        return 11;
+    else if(val1 == 2)
+        return 01;
+    else if(val1 == 3)
+        return 10;
+    else{
+        printf("Error"); exit(0);
+    }
+}
+
 //TAMANHO DO VETOR PRECISA SER SEMPRE MULTIPLO DE 2
-bool multiplo_de_dois(int valor){
+bool multiploDeDois(int valor){
     if(valor%2 == 0){
         return true;
     }else{
@@ -50,21 +69,30 @@ bool multiplo_de_dois(int valor){
 
 // GERA ARRAY ALEATORIO
 // O vetor aleatório é gerado a partir de um random de 0 ou 1
-
-int RandomArray(int *array, int sizeVet){
+int arrayAleatorio(int *array, int tamVetor){
      int i;
-     for(i = 0; i < sizeVet; i++){
-         int random = randomRange(0,2);
+     
+     for(i = 0; i < tamVetor; i++){
+         int random = serieRandomica(0,2);
          array[i] = random;
      }
+     if(!multiploDeDois(tamVetor)){
+         if(array[i-1] == 0){
+             array[i] = 0;
+         }else{
+             array[i] = 1;
+         }
+     }
+     
      return *array;
 }
 
 //GERA O "Y" A PARTIR DO ARRAY
-int GeraYRandom(int *y,int sizeVet, int *array){
+int geraYRandom(int *y, int tamVetor, int *array){
     int i;
-    for( i = 0; i < sizeVet; i++){
-        int random = randomRange(0, sizeVet);
+    
+    for(i = 0; i < tamVetor-1; i++){
+        int random = serieRandomica(0, tamVetor-1);
         y[i] = array[random];
     }
     return *y;
@@ -72,80 +100,106 @@ int GeraYRandom(int *y,int sizeVet, int *array){
 
 //GERA O VETOR "Y" NAO ALEATORIO
 // Vetor Y é gerado a partir do vetor ARRAY não aleatório
-int GeraY(int *y,int sizeVet, int *array){
+int geraY(int *y, int tamVetor, int *array){
     int i;
-    for( i = 0; i < sizeVet; i++){
+    
+    for(i = 0; i < tamVetor; i++){
         y[i] = array[i];
-        printf("%d",y[i]);
+        printf("%d", y[i]);
     }
     return *y;
 }
 
 // PREEECHER VETOR CASO O USUARIO NAO QUEIRA GERAR ALEATORIO
-int PreencheArray(int *array, int sizeVet){
+int preencheArray(int *array, int tamVetor){
     int i, val;
-    for(i = 0; i < sizeVet; i++){
-        printf("VALOR %d:", i+1);
+    
+    for(i = 0; i < tamVetor; i++){
+        printf("\t\tVALOR %d:", i+1);
         scanf("%d", &val);
-        array[i] = val;
+        
+		array[i] = val;
+    }
+    if(!multiploDeDois(tamVetor)){
+         if(array[i-1] == 0){
+             array[i] = 0;
+         }else{
+             array[i] = 1;
+         }
     }
     return *array;
 }
 
 // GERA O VETOR Z
-// Vetor Z é resultado do ( Xor X and Y ) 
-int VetorZ(int *z, int sizeVet, int *x, int *y){
-    //vector z generate
+// Vetor Z é resultado do (Xor X and Y) 
+int vetorZ(int *z, int tamVetor, int *x, int *y){
     int i;
-    for(i = 0; i < sizeVet; i++){
+    
+    for(i = 0; i < tamVetor; i++){
         int or = x[i]|x[i];
         int and = (or != y[i]) ? 1 : 0;
         z[i] = and;
     }
     
-    printf("\nVector z:\n");
-    printVector(z, 0, sizeVet-1);
-    return *z;
+    printf("\n\t\t\t>>Vetor Z<<\n");
+    imprimeVetor(z, 0, tamVetor-1);
+    
+	return *z;
 }
 
-// RESULTADO DA COMPACTACAO
-int Resultado(int *result, int sizeVet, int *z){
-    int j = 0;
-    int i;
+//RESULTADO DA COMPACTACAO
+int compactacao(int *compacta, int tamVetor, int *z){
+    int i, j = 0;
 
-    for(i = 0; i < sizeVet; i+=2){
-         result[j] = compress(z[i], z[i+1]);
-         j++;
+    for(i = 0; i < tamVetor; i+=2){
+        compacta[j] = comprimeDados(z[i], z[i+1]);
+        j++;
     }
 
-    printf("\nResult:\n");
-    printVector(result, 0, ((sizeVet-1)/2));
-    return *result;
+    printf("\n\n\t\t\t>>Vetor Compactado<<\n");
+    imprimeVetor(compacta, 0, ((tamVetor-1)/2));
+    return *compacta;
+}
+
+//RESULTADO DA DESCOMPACTACAO
+int descompactacao(int *descompacta, int tamVetor, int *compacta){
+    int i, j = 0;
+
+    for(i = 0; i < tamVetor; i++){
+        descompacta[j] = descomprimeDados(compacta[i]);
+        j++;
+    }
+
+    printf("\n\t\t\t>>Vetor Descompactado<<\n");
+    imprimeVetor(descompacta, 0, ((tamVetor-1)/2));
+    return *descompacta;
 }
 
 // Imprime os vetores finais, array, x, y
-void print_valor_dos_vetores(int *array, int *x, int *y, int sizeVet){
+void imprimeValorVetores(int *array, int *x, int *y, int tamVetor){
 
-    printf("Vector random (array): \n");
-    printVector(array, 0, sizeVet-1);
+    printf("\t\t\t>>Vetor RANDOM<<\n");
+    imprimeVetor(array, 0, tamVetor-1);
 
-    printf("\nVector x (array): \n");
-    printVector(x, 0, sizeVet-1);
+    printf("\n\t\t\t>>Vetor X<<\n");
+    imprimeVetor(x, 0, tamVetor-1);
     
-    printf("\nVector y (array): \n");
-    printVector(y, 0, sizeVet-1);
+    printf("\n\t\t\t>>Vetor Y<<\n");
+    imprimeVetor(y, 0, tamVetor-1);
 }
 
 
 // PRINCIPAL
 int main(){
-
-    int sizeVet, gerar;
-    int array[sizeVet];
+	setlocale(LC_ALL, "Portuguese");
+	
+    int tamVetor, gerar;
+    int array[tamVetor];
     int x[20] = {1,0,1,1,0,1,0,1,0,0,1,1,0,0,1,1,0,0,1,0};
-    int y[sizeVet]; //y gerado apartir do array
-    int z[sizeVet]; // vetor criptografado
-    int result[sizeVet/2]; // vetor compressado
+    int y[tamVetor]; //y gerado apartir do array
+    int z[tamVetor]; // vetor criptografado
+    int compacta[tamVetor/2]; // vetor comprimido
+    int descompacta[tamVetor]; // vetor descomprimido
 
     //int array[20] = {0,1,0,1,0,0,1,1,0,1,1,0,1,0,1,0,1,0,1,0}; // para teste igual ao artigo
     //int y[20] = {0,1,0,1,0,0,1,1,0,1,1,0,1,0,1,0,1,0,1,0};  // para teste igual ao artigo
@@ -155,29 +209,38 @@ int main(){
     srand(time(NULL));
 
     //ENTRADA TAMANHO DO VETOR
-    printf("Informe o tamanho do vetor (multiplo de 2): ");
-    scanf("%d", &sizeVet);
+    printf("\t\tINFORME O TAMANHO DO VETOR (com valor máximo de 20 e múltiplo de 2): ");
+    scanf("%d", &tamVetor);
+	printf("\n");
+	
+   // if(!multiploDeDois(tamVetor)){
+		printf("\n\n\n\t\tO VALOR DIGITADO NAO É MULTIPLO DE 2\n\n\n");
+    //}else{
+    	printf("\t\tDESEJA GERAR VALORES ALEATÓRIOS? (1-sim / 2-não) ");
+        scanf("%d", &gerar);
+        printf("\n");
 
-    if(!multiplo_de_dois(sizeVet)){
-        printf("\n\n\n O VALOR DIGITADO NAO Eh MULTIPLO DE 2\n\n\n");
-    }else{
-          printf(" DESEJA GERAR VALORES ALEATORIOS ?(1-sim 2-nao)");
-          scanf("%d", &gerar);
-
-          if(gerar==1){
-             //random array
-             RandomArray(array,sizeVet);
-             GeraYRandom(y,sizeVet,array);
-             print_valor_dos_vetores(array,x,y,sizeVet);
-             VetorZ(z,sizeVet,x,y);
-             Resultado(result,sizeVet,z);
-
-          }else if(gerar==2){
-              PreencheArray(array,sizeVet);
-              GeraY(y,sizeVet,array);
-              print_valor_dos_vetores(array,x,y,sizeVet);
-              VetorZ(z,sizeVet,x,y);
-              Resultado(result,sizeVet,z);
-          }
-    }
+        if(gerar == 1){
+			//random array
+        	arrayAleatorio(array, tamVetor);   
+            if(!multiploDeDois(tamVetor)){
+                tamVetor = tamVetor +1;
+            } 
+        	geraYRandom(y, tamVetor, array);
+            imprimeValorVetores(array, x, y, tamVetor);
+        	vetorZ(z, tamVetor, x, y);
+        	compactacao(compacta, tamVetor, z);
+        	descompactacao(descompacta, tamVetor, compacta);
+	    }else if(gerar == 2){
+            preencheArray(array, tamVetor);
+            if(!multiploDeDois(tamVetor)){
+                tamVetor = tamVetor +1;
+            }
+            geraY(y, tamVetor, array);
+        	imprimeValorVetores(array, x, y, tamVetor);
+            vetorZ(z, tamVetor, x, y);
+            compactacao(compacta, tamVetor, z);
+            descompactacao(descompacta, tamVetor, compacta);
+        }
+   // }
 }
